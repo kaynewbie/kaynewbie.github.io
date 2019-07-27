@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>用 Address Sanitizer 调试内存问题 | Kai的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="最近，考虑到自身算法和数据结构基础薄弱，想在平日做些积累，保持对算法的敏感性。于是，开始整上了 “剑指 Offer” 并在 Leetcode 上刷题。 刷题过程中，碰到些题目需要动态开辟内存，如 Longest Common Prefix 和 *Count and Say*。于是，在解题过程中，使用了 C 的一些动态开辟内存函数，在 Xcode 中编写完成且通过测试用例后，将代码贴到 Leetco">
+<meta name="keywords" content="LLVM,address-sanitizer,memory-error,C&#x2F;C++,buffer-overflow">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用 Address Sanitizer 调试内存问题">
+<meta property="og:url" content="https://kaynewbie.github.io/2019/07/27/address-sanitizer/index.html">
+<meta property="og:site_name" content="Kai的博客">
+<meta property="og:description" content="最近，考虑到自身算法和数据结构基础薄弱，想在平日做些积累，保持对算法的敏感性。于是，开始整上了 “剑指 Offer” 并在 Leetcode 上刷题。 刷题过程中，碰到些题目需要动态开辟内存，如 Longest Common Prefix 和 *Count and Say*。于是，在解题过程中，使用了 C 的一些动态开辟内存函数，在 Xcode 中编写完成且通过测试用例后，将代码贴到 Leetco">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-07-27T15:37:04.007Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="用 Address Sanitizer 调试内存问题">
+<meta name="twitter:description" content="最近，考虑到自身算法和数据结构基础薄弱，想在平日做些积累，保持对算法的敏感性。于是，开始整上了 “剑指 Offer” 并在 Leetcode 上刷题。 刷题过程中，碰到些题目需要动态开辟内存，如 Longest Common Prefix 和 *Count and Say*。于是，在解题过程中，使用了 C 的一些动态开辟内存函数，在 Xcode 中编写完成且通过测试用例后，将代码贴到 Leetco">
+  
+    <link rel="alternate" href="/atom.xml" title="Kai的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Kai的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://kaynewbie.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-address-sanitizer" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/07/27/address-sanitizer/" class="article-date">
+  <time datetime="2019-07-27T15:32:58.000Z" itemprop="datePublished">2019-07-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      用 Address Sanitizer 调试内存问题
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近，考虑到自身算法和数据结构基础薄弱，想在平日做些积累，保持对算法的敏感性。于是，开始整上了 “剑指 Offer” 并在 Leetcode 上刷题。</p>
+<p>刷题过程中，碰到些题目需要动态开辟内存，如 <em><a href="https://leetcode.com/problems/longest-common-prefix/" target="_blank" rel="noopener">Longest Common Prefix</a></em> 和 *<a href="https://leetcode.com/problems/count-and-say/" target="_blank" rel="noopener">Count and Say</a>*。于是，在解题过程中，使用了 C 的一些动态<a href="https://en.wikipedia.org/wiki/C_dynamic_memory_allocation#Usage_example" target="_blank" rel="noopener">开辟内存函数</a>，在 Xcode 中编写完成且通过测试用例后，将代码贴到 Leetcode 上，运行报错：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AddressSanitizer: heap-buffer-overflow on address 0x6040000000fc at pc 0x00000040196c bp 0x7fffa37d1930 sp 0x7fffa37d1928</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<p>看到错误信息，不了解什么是 <strong>AddressSanitizer</strong>，于是开始查阅资料，作些记录。</p>
+<p>另外，因为内存管理在任何开发语言中都是重要知识点，所以作此笔记。</p>
+<h2 id="什么是-AddressSanitizer"><a href="#什么是-AddressSanitizer" class="headerlink" title="什么是 AddressSanitizer"></a>什么是 AddressSanitizer</h2><p>AddressSanitizer(ASan) 是 Google 开源的一个快速发现内存错误的检查器。它能定位以下问题：</p>
+<ul>
+<li>使用被释放的内存（野指针）</li>
+<li>堆区缓存溢出</li>
+<li>栈区缓存溢出</li>
+<li>全局区缓存溢出</li>
+<li>在返回后使用</li>
+<li>作用域外使用</li>
+<li>初始化顺序问题</li>
+<li>内存泄露</li>
+</ul>
+<p>ASan 由编译期组件和运行时库组成，现已集成到 <em>LLVM</em> 中。</p>
+<h2 id="如何碰到此问题"><a href="#如何碰到此问题" class="headerlink" title="如何碰到此问题"></a>如何碰到此问题</h2><p>在解<br><em><a href="https://leetcode.com/problems/longest-common-prefix/" target="_blank" rel="noopener">Longest Common Prefix</a></em> 过程中，起初算法如下：遍历二维数组首个元素，遍历过程中用当前的字符去匹配二维数组剩下元素对应索引的字符，匹配成功则存到新开辟的内存块中，存之前判断内存块容量是否足够，不足够则扩展内存。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">char</span> *<span class="title">longestCommonPrefix</span><span class="params">(<span class="keyword">char</span> ** strs, <span class="keyword">int</span> strsSize)</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> capacity = <span class="number">5</span>;</span><br><span class="line">    <span class="keyword">char</span> *pInFirstStr = *strs;</span><br><span class="line">    <span class="keyword">char</span> *result = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">char</span>) * capacity);</span><br><span class="line">    <span class="keyword">int</span> idx = <span class="number">0</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">char</span> c;</span><br><span class="line">    <span class="keyword">bool</span> success;</span><br><span class="line">    <span class="keyword">while</span> (*(pInFirstStr + idx) != <span class="string">'\0'</span>) &#123; <span class="comment">// 遍历首元素的字符</span></span><br><span class="line">        success = <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; strsSize; i++) &#123; <span class="comment">// 用当前字符匹配二维数组剩余元素</span></span><br><span class="line">            c = *(*(strs + i) + idx);</span><br><span class="line">            <span class="keyword">if</span> (*(pInFirstStr + idx) != c) &#123;<span class="comment">// 匹配失败，则终止，说明已经找到最长公共子字符串</span></span><br><span class="line">                success = <span class="literal">false</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (!success) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (idx &gt;= capacity) &#123;<span class="comment">// 内存扩容</span></span><br><span class="line">            capacity += <span class="number">10</span>;</span><br><span class="line">            result = <span class="built_in">realloc</span>(result, capacity);</span><br><span class="line">        &#125;</span><br><span class="line">        result[idx] = *(pInFirstStr + idx); <span class="comment">// 记录公共子字符串</span></span><br><span class="line">        idx++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Leetcode 上的<a href="https://leetcode.com/submissions/detail/244034342/" target="_blank" rel="noopener">提交记录</a>。</p>
+<h2 id="如何解决此问题"><a href="#如何解决此问题" class="headerlink" title="如何解决此问题"></a>如何解决此问题</h2><p>首先，考虑到 Xcode 中运行相同测试用例并没有碰到此错误，查阅发现，Xcode 默认并未开启 ASan 选项，于是先打开 ASan：<br><em>在 Xcode 中开启 ASan: Edit Scheme -&gt; Run -&gt; Disgnostics -&gt; Runtime Sanitization</em>。</p>
+<p>接着，跟想象中的一样，运行报了相同的内存错误。反复检查代码，发现，不需要提早开辟内存块，因为最长公共子字符串肯定是包含在数组元素中。</p>
+<p>于是，优化代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">commonPrefixLength</span><span class="params">(<span class="keyword">char</span> *first, <span class="keyword">int</span> firstL, <span class="keyword">char</span> *second)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> 1. 声明最长共同前缀指针，起始指向第一个字符串</span></span><br><span class="line"><span class="comment"> 2. 声明最长共同前缀长度</span></span><br><span class="line"><span class="comment"> 3. 遍历</span></span><br><span class="line"><span class="comment"> 4. 遍历结束后，从第一个字符串中拷贝出指定长度的字符串</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">char</span> *<span class="title">longestCommonPrefix</span><span class="params">(<span class="keyword">char</span> ** strs, <span class="keyword">int</span> strsSize)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (strsSize &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">""</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">char</span> *firstStr; <span class="comment">// 第一个字符串</span></span><br><span class="line">    <span class="keyword">char</span> *currentS; <span class="comment">// 遍历过程中的当前字符串</span></span><br><span class="line">    <span class="keyword">int</span> prefixLength; <span class="comment">// 遍历过程中的最长公共前缀长度</span></span><br><span class="line">    </span><br><span class="line">    firstStr = *strs;</span><br><span class="line">    prefixLength = (<span class="keyword">int</span>)<span class="built_in">strlen</span>(firstStr);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; strsSize; i++) &#123;</span><br><span class="line">        currentS = strs[i];</span><br><span class="line">        </span><br><span class="line">        prefixLength = commonPrefixLength(firstStr, prefixLength, currentS);</span><br><span class="line">        <span class="keyword">if</span> (prefixLength == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">char</span> *result = <span class="built_in">malloc</span>((<span class="keyword">sizeof</span>(<span class="keyword">char</span>) * prefixLength) + <span class="number">1</span>);</span><br><span class="line">    <span class="built_in">memcpy</span>(result, firstStr, prefixLength);</span><br><span class="line">    result[prefixLength] = <span class="string">'\0'</span>;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> 获取两个字符串最大前缀长度</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">commonPrefixLength</span><span class="params">(<span class="keyword">char</span> *first, <span class="keyword">int</span> firstL, <span class="keyword">char</span> *second)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> commonL = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (commonL &lt; firstL &amp;&amp; *first != <span class="string">'\0'</span> &amp;&amp; first[commonL] == second[commonL]) &#123;</span><br><span class="line">        commonL++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> commonL;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://leetcode.com/submissions/detail/246388133/" target="_blank" rel="noopener">Leetcode 提交记录</a>。</p>
+<p>上述代码，<strong>将开辟内存空间放在最后且只会根据 <code>prefixLength</code> 创建一次，避免了复杂的扩容过程</strong>。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>如何避免编码过程中出现类似的内存问题：</p>
+<ul>
+<li>开发时尽量使用 ASan 调试代码</li>
+<li>在必要的时候再去开辟内存</li>
+<li>充足的测试用例</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://github.com/google/sanitizers" target="_blank" rel="noopener">Address Sanitizer Repo</a></li>
+<li><a href="https://github.com/google/sanitizers/wiki/AddressSanitizer" target="_blank" rel="noopener">Address Sanitizer Wiki</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://kaynewbie.github.io/2019/07/27/address-sanitizer/" data-id="cjylp1vbv0000rjxp9o7053md" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C-C/">C/C++</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLVM/">LLVM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/address-sanitizer/">address-sanitizer</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/buffer-overflow/">buffer-overflow</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/memory-error/">memory-error</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2019/07/24/A-tour-of-the-dart-language/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Dart 入门 (译)</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/">C/C++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LLVM/">LLVM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/address-sanitizer/">address-sanitizer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/buffer-overflow/">buffer-overflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dart/">dart</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flutter/">flutter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/memory-error/">memory-error</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/LLVM/" style="font-size: 10px;">LLVM</a> <a href="/tags/address-sanitizer/" style="font-size: 10px;">address-sanitizer</a> <a href="/tags/buffer-overflow/" style="font-size: 10px;">buffer-overflow</a> <a href="/tags/dart/" style="font-size: 10px;">dart</a> <a href="/tags/flutter/" style="font-size: 10px;">flutter</a> <a href="/tags/memory-error/" style="font-size: 10px;">memory-error</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/27/address-sanitizer/">用 Address Sanitizer 调试内存问题</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/24/A-tour-of-the-dart-language/">Dart 入门 (译)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/21/cell_高度自适应/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/21/lldb/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Kai<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

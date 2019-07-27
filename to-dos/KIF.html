@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>Kai的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="KIF 文档  原文地址：https://github.com/kif-framework/KIF. KIF文档地址：http://cocoadocs.org/docsets/KIF/2.0.0/index.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kai的博客">
+<meta property="og:url" content="https://kaynewbie.github.io/to-dos/KIF.html">
+<meta property="og:site_name" content="Kai的博客">
+<meta property="og:description" content="KIF 文档  原文地址：https://github.com/kif-framework/KIF. KIF文档地址：http://cocoadocs.org/docsets/KIF/2.0.0/index.html">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-07-21T10:36:03.088Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kai的博客">
+<meta name="twitter:description" content="KIF 文档  原文地址：https://github.com/kif-framework/KIF. KIF文档地址：http://cocoadocs.org/docsets/KIF/2.0.0/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Kai的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Kai的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://kaynewbie.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="page-undefined" class="article article-type-page" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/to-dos/KIF.html" class="article-date">
+  <time datetime="2019-07-21T10:36:03.088Z" itemprop="datePublished">2019-07-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="KIF-文档"><a href="#KIF-文档" class="headerlink" title="KIF 文档"></a>KIF 文档</h1><blockquote>
+<p> <strong>原文地址：</strong><a href="https://github.com/kif-framework/KIF" target="_blank" rel="noopener">https://github.com/kif-framework/KIF</a>.<br> <strong>KIF文档地址：</strong><a href="http://cocoadocs.org/docsets/KIF/2.0.0/index.html" target="_blank" rel="noopener">http://cocoadocs.org/docsets/KIF/2.0.0/index.html</a></p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="1-KIF介绍"><a href="#1-KIF介绍" class="headerlink" title="1.KIF介绍"></a>1.KIF介绍</h2><ul>
+<li>关键类： <strong>KIFTestCase</strong>是<strong>XCTestCase</strong>的子类、<strong>KIFUITestActor</strong></li>
+<li>主要方法：     </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">case类: beforeEach, afterEach, testXXXX;</span><br><span class="line">actor类: tapViewWithAccessibilityLabel:, waitForViewWithAccessibilityLabel:,</span><br><span class="line">在代码中设置: setAccessibilityLabel:, setIsAccessibilityElement:;</span><br><span class="line">switch: setOn: forSwitchWithAccessibilityLabel:  </span><br><span class="line">```		    </span><br><span class="line"></span><br><span class="line">## 2.KIF集成（使用cocoapods）</span><br><span class="line"></span><br><span class="line">* 创建项目，不勾选 `include Unit Test` 和 `include UI Test`(勾选怎么操作？)；  </span><br><span class="line">* 导航目录选中项目，然后在target左下角点击加号(区别于窗口左下角的加号)，选中`unit bundle`，命名确定；  </span><br><span class="line">* 导航目录下生成target，其中`.m`文件，将其删除(因为我们要使用KIF);  </span><br><span class="line">* 创建podfile，内容如下，保存退出，`pod install`，编辑，完成</span><br></pre></td></tr></table></figure>
+
+<p>target ‘Acceptance Tests’, :exclusive =&gt; true do<br>pod ‘KIF’, ‘~&gt; 3.0’, :configurations =&gt; [‘Debug’]<br>end</p>
+<pre><code>
+## 3.KIF使用 
+
+* 选中项目,再选中你刚创建的target-&gt;Build Phases-&gt;Target Dependencies，点+，选中响应target；  
+* Build Setting-&gt;Linking-&gt;Bundle Loader,写入`$(BUILT_PRODUCTS_DIR)/你的项目名字.app/你的项目名字`；  
+* Build Setting-&gt;Testing-&gt;Test Host,写入`$(BUNDLE_LOADER)`，搜索`Wrapper Extension`，确认对应`xctest`
+
+###    使用方法  
+* 测试target中，创建KIFTestCase的子类，.m中实现`beforeEach`(数据初始化)，测试方法(`testXXXX`，编译器会自动检测到并执行)
+* 测试方法中，`[tester tapViewWithAccessibilityLabel:]`主要是这个方法，其他有些不同控件方法不一样,(switch,alertController,etc)
+* 切换视图控制器，要用`waitForViewWithAccessibilityLabel:`保证视图控制器已经出现
+
+## 4.常见问题
+* cocoapods头文件找不到?    
+`build setting`下`User Header Search Paths`(区别于`Header Search Paths`)，写入`${SRCROOT}`,选择`recursive`    
+* 模拟器加载但是应用没有出现，加载10秒超时  
+检查`Test Host`设置是否正确
+* 测试方法超时，view not found
+视图设置`accessibility label`。xib中设置步骤: `inspector`第三个，`accessibility`组中的`Label`
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://kaynewbie.github.io/to-dos/KIF.html" data-id="cjylp1vbz0001rjxpy1h1ykw9" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/">C/C++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LLVM/">LLVM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/address-sanitizer/">address-sanitizer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/buffer-overflow/">buffer-overflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dart/">dart</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flutter/">flutter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/memory-error/">memory-error</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/LLVM/" style="font-size: 10px;">LLVM</a> <a href="/tags/address-sanitizer/" style="font-size: 10px;">address-sanitizer</a> <a href="/tags/buffer-overflow/" style="font-size: 10px;">buffer-overflow</a> <a href="/tags/dart/" style="font-size: 10px;">dart</a> <a href="/tags/flutter/" style="font-size: 10px;">flutter</a> <a href="/tags/memory-error/" style="font-size: 10px;">memory-error</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/27/address-sanitizer/">用 Address Sanitizer 调试内存问题</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/24/A-tour-of-the-dart-language/">Dart 入门 (译)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/21/cell_高度自适应/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/21/lldb/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Kai<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>Kai的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="归档(Archive)归档提供了一种将对象和值转变成独立结构的字节流的方法，这个字节流保存了关于对象和值的标识。支持的数据类型：对象，纯量，数组，结构体，字符串。不支持一些跨平台的数据类型，比如：union, void *, 函数指针, 长链表的指针。归档会一同保存对象的类型信息，所以解档之后的数据会和归档之前的一样。解档异常情况可参照这里: 异常情况。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kai的博客">
+<meta property="og:url" content="https://kaynewbie.github.io/to-dos/归档序列化变成指南.html">
+<meta property="og:site_name" content="Kai的博客">
+<meta property="og:description" content="归档(Archive)归档提供了一种将对象和值转变成独立结构的字节流的方法，这个字节流保存了关于对象和值的标识。支持的数据类型：对象，纯量，数组，结构体，字符串。不支持一些跨平台的数据类型，比如：union, void *, 函数指针, 长链表的指针。归档会一同保存对象的类型信息，所以解档之后的数据会和归档之前的一样。解档异常情况可参照这里: 异常情况。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-07-21T10:36:03.088Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kai的博客">
+<meta name="twitter:description" content="归档(Archive)归档提供了一种将对象和值转变成独立结构的字节流的方法，这个字节流保存了关于对象和值的标识。支持的数据类型：对象，纯量，数组，结构体，字符串。不支持一些跨平台的数据类型，比如：union, void *, 函数指针, 长链表的指针。归档会一同保存对象的类型信息，所以解档之后的数据会和归档之前的一样。解档异常情况可参照这里: 异常情况。">
+  
+    <link rel="alternate" href="/atom.xml" title="Kai的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Kai的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://kaynewbie.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="page-undefined" class="article article-type-page" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/to-dos/归档序列化变成指南.html" class="article-date">
+  <time datetime="2019-07-21T10:36:03.088Z" itemprop="datePublished">2019-07-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="归档-Archive"><a href="#归档-Archive" class="headerlink" title="归档(Archive)"></a>归档(Archive)</h1><p>归档提供了一种将对象和值转变成独立结构的字节流的方法，这个字节流保存了关于对象和值的标识。<br>支持的数据类型：对象，纯量，数组，结构体，字符串。不支持一些跨平台的数据类型，比如：<code>union</code>, <code>void *</code>, 函数指针, 长链表的指针。<br>归档会一同保存对象的类型信息，所以解档之后的数据会和归档之前的一样。解档异常情况可参照这里: <a href="xcdoc://?url=developer.apple.com/library/ios/documentation/Cocoa/Conceptual/Archiving/Articles/codingobjects.html#//apple_ref/doc/uid/20000948-97072" target="_blank" rel="noopener">异常情况</a>。  </p>
+<a id="more"></a>
+
+<h2 id="编码对象"><a href="#编码对象" class="headerlink" title="编码对象"></a>编码对象</h2><p>对象要通过<strong>编码对象</strong>写入或读取归档。编码对象是 <code>NSCoder(抽象类)</code> 之类的实例。 <code>NSCoder</code> 声明一个广泛的接口，用来保存信息到对象中并且放到其他适合写入到文件中的格式，在程序或者不同网络之间传递，或者执行其他数据类型的交换。也有翻转数据类型的接口。子类实现合适的接口支持特殊的归档格式。<br>编码对象通过适当的方法编解码。归档：发送 <code>encodeWithCoder:</code> 给对象，解档：发送 <code>initWithCoder:</code>。只有遵循了 <code>NSCoding</code> 协议，才能归档。编码时，编码对象纪录对象的类的标识或者 <code>OC</code> 值的类型的标识以及在层级结构中的位置。<br>为了解决冗余和约束的问题，引入根对象和条件对象。    </p>
+<h3 id="根对象"><a href="#根对象" class="headerlink" title="根对象"></a>根对象</h3><p>两个对象可能互相引用，造成循环引用。如果编码对象盲目编码，可能会无限循环。单个对象也可能被多个对象引用，编码对象必须区别并处理多个引用或者循环引用，保证编解码正常。<br>解决以上问题，引入根对象。根对象是对象图中的起点。调用编码方法，传入第一个对象开始编码。在这个调用环境中的每个对象都可以被追踪。如果要多次编码同一个对象，只会编码引用而不会重新对该对象编码。<br><code>NSCoder</code> 不会实现对根对象的支持；<code>NSCoder</code> 的 <code>encodeRootObject:</code> 实现，通过调用 <code>encodeObject:</code> 编码对象。他的子类有责任追踪多个引用的对象，这样来保存任何对象图的结构题。    </p>
+<h3 id="条件对象"><a href="#条件对象" class="headerlink" title="条件对象"></a>条件对象</h3><p>有些对象图不适合完全编码。比如某个视图引用了非常多对象（<code>window</code>, <code>target</code>），可能牵扯到整个应用。有些父视图就不需要归档。如果父视图也归档的话，就要对父视图引用。<br>条件对象可以解决这个问题。一个条件对象应该被编码，当且仅当，在其他地方被无条件的编码。条件对象通过 <code>encodeConditionalObject:forKey:</code> 编码。如果所有请求编码对象都是通过这些条件方法，那这个对象不能被编码，并且引用他的解码是空。如果这个对象在其他地方被编码了，所有条件引用解码到单独的编码对象。<br><code>NSCoder</code> 不实现对条件对象的支持；<code>NSCoder</code> 的 <code>encodeConditionalObject:forKey:</code> 实现，通过调用 <code>encodeObject:forKey:</code> 编码对象。子类有责任追踪条件对象，并且除非对象需要，否则不对其编码。    </p>
+<h2 id="有键的归档"><a href="#有键的归档" class="headerlink" title="有键的归档"></a>有键的归档</h2><p>有键归档是通过 <code>NSKeyedArchiver</code> 对象创建，<code>NSKeyedUnarchiver</code> 解码。有键归档在编码值方面不同于有序的归档，他是给定名字或者键。解码归档时，通过名字请求值，允许值按任意顺序或者无序请求。这种自由度给类更灵活地向前兼容或向后兼容。    </p>
+<h3 id="值命名"><a href="#值命名" class="headerlink" title="值命名"></a>值命名</h3><p>对象编码到文档中的值可以单独地用任意字符串命名。文档时分层级的，每个对象编码的值都定义了单独的命名空间，和对象的实例变量类似。因此，当前对象编码的作用域内是键是唯一的。但是不同的对象键不会冲突，即使是同一个类。单个的对象中，子类的键会和父类的键冲突。<br>对于一些公共的可以子类化的类，名字要添加一些前缀来避免以后子类可能用到。合理的前缀是类的全名。<br>避免使用<code>$</code>。<br>子类也要一定程度上当心前缀的使用，避免和父类冲突。</p>
+<h3 id="键缺失情况下的返回值"><a href="#键缺失情况下的返回值" class="headerlink" title="键缺失情况下的返回值"></a>键缺失情况下的返回值</h3><p>解码期间，如果一个键的值不存在，解档对象就会根据调用方法的返回值返回默认值（<code>nil for objects</code>, <code>NO for booleans</code>, <code>0.0 for reals</code>, <code>NSZeroSize for sizes</code>等等）。可以用 <code>containsValueForKey:</code> 方法检测是否存在这个键。但不推荐，影响性能，返回值就已经足够了。</p>
+<h3 id="类型强制转换"><a href="#类型强制转换" class="headerlink" title="类型强制转换"></a>类型强制转换</h3><p><code>NSKeyedUnarchiver</code> 支持限制类型强制转换。整形编码，解码后可以是任意整形。浮点类似。编码的值类型相对解码过大，会抛出异常。<a href="xcdoc://?url=developer.apple.com/library/ios/documentation/Cocoa/Reference/Foundation/Miscellaneous/Foundation_Constants/index.html#//apple_ref/doc/c_ref/NSRangeException" target="_blank" rel="noopener">NSRangeException</a>。此外，浮点整形互转会抛异常<a href="xcdoc://?url=developer.apple.com/library/ios/documentation/Cocoa/Reference/Foundation/Classes/NSKeyedUnarchiver_Class/index.html#//apple_ref/doc/c_ref/NSInvalidUnarchiveOperationException" target="_blank" rel="noopener">NSInvalidUnarchiveOperationException</a>。    </p>
+<h3 id="类版本控制"><a href="#类版本控制" class="headerlink" title="类版本控制"></a>类版本控制</h3><h3 id="代理"><a href="#代理" class="headerlink" title="代理"></a>代理</h3><p><code>NSKeyedArchiver</code>, <code>NSKeyedUnarchiver</code>都有代理。</p>
+<h3 id="无键的编码方法"><a href="#无键的编码方法" class="headerlink" title="无键的编码方法"></a>无键的编码方法</h3><p>可以使用没有没有键的编码，但不提倡。</p>
+<h1 id="创建以及提取归档"><a href="#创建以及提取归档" class="headerlink" title="创建以及提取归档"></a>创建以及提取归档</h1><h2 id="创建归档对象"><a href="#创建归档对象" class="headerlink" title="创建归档对象"></a>创建归档对象</h2><p>被编码对象要遵循 <code>NSCoding</code> 协议，实现协议方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">- (instancetype)initWithCoder:(NSCoder *)aDecoder &#123;</span><br><span class="line">    if (self = [super init]) &#123;</span><br><span class="line">        _name = [aDecoder decodeObjectForKey:NSStringFromSelector(@selector(name))];</span><br><span class="line">        _age = [aDecoder decodeIntegerForKey:NSStringFromSelector(@selector(age))];</span><br><span class="line">        _gender = [aDecoder decodeObjectForKey:NSStringFromSelector(@selector(gender))];</span><br><span class="line">    &#125;</span><br><span class="line">    return self;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)encodeWithCoder:(NSCoder *)aCoder &#123;</span><br><span class="line">    [aCoder encodeObject:_name forKey:NSStringFromSelector(@selector(name))];</span><br><span class="line">    [aCoder encodeInteger:_age forKey:NSStringFromSelector(@selector(age))];</span><br><span class="line">    [aCoder encodeObject:_gender forKey:NSStringFromSelector(@selector(gender))];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>归档操作:    </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Person* aPerson = [Person new];</span><br><span class="line">aPerson.name = @&quot;Kai&quot;;</span><br><span class="line">aPerson.age = 24;</span><br><span class="line">aPerson.gender = @&quot;male&quot;;</span><br><span class="line">    </span><br><span class="line">NSMutableData* data = [[NSMutableData alloc] init];</span><br><span class="line">NSKeyedArchiver* archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:data];</span><br><span class="line">[archiver encodeObject:aPerson forKey:personKey];</span><br><span class="line">[archiver finishEncoding];</span><br><span class="line">    </span><br><span class="line">NSString* path = [self pathForArchive];</span><br><span class="line">BOOL result = [data writeToFile:path atomically:YES];</span><br></pre></td></tr></table></figure>
+
+<p>解档操作:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">NSData* data = [NSData dataWithContentsOfFile:path];</span><br><span class="line">    </span><br><span class="line">NSKeyedUnarchiver* unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];</span><br><span class="line">id obj = [unarchiver decodeObjectForKey:personKey];</span><br><span class="line">[unarchiver finishDecoding];</span><br></pre></td></tr></table></figure>
+
+<h1 id="编解码对象"><a href="#编解码对象" class="headerlink" title="编解码对象"></a>编解码对象</h1><h2 id="编码一个对象"><a href="#编码一个对象" class="headerlink" title="编码一个对象"></a>编码一个对象</h2><p>如果一个对象的父类也遵循了 NSCoding 协议，需要先调用父类的 encodeWithCoder: 。</p>
+<h2 id="解码一个对象"><a href="#解码一个对象" class="headerlink" title="解码一个对象"></a>解码一个对象</h2><p>如果一个对象的父类也遵循了 NSCoding 协议，需要先调用父类的 initWithCoder: 。</p>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><p>编码越少，解码就越少，读写速度就会更加快。只写和类相关的项目。<br>不需要的项不要将其写出。<br>尽量不要使用 <code>containsValueForKey:</code> ，除非要区分空值的默认值和真实值相同的情况。<br>加速解码比加速编码更有意义。<br>避免使用<code>$</code>。</p>
+<h2 id="编码期间使用替换"><a href="#编码期间使用替换" class="headerlink" title="编码期间使用替换"></a>编码期间使用替换</h2><h1 id="序列化属性列表"><a href="#序列化属性列表" class="headerlink" title="序列化属性列表"></a>序列化属性列表</h1><p><code>NSPropertyListSerialization</code></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://kaynewbie.github.io/to-dos/归档序列化变成指南.html" data-id="cjylp1vc40006rjxp1mylzayp" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/">C/C++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/LLVM/">LLVM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/address-sanitizer/">address-sanitizer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/buffer-overflow/">buffer-overflow</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dart/">dart</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/flutter/">flutter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/memory-error/">memory-error</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/LLVM/" style="font-size: 10px;">LLVM</a> <a href="/tags/address-sanitizer/" style="font-size: 10px;">address-sanitizer</a> <a href="/tags/buffer-overflow/" style="font-size: 10px;">buffer-overflow</a> <a href="/tags/dart/" style="font-size: 10px;">dart</a> <a href="/tags/flutter/" style="font-size: 10px;">flutter</a> <a href="/tags/memory-error/" style="font-size: 10px;">memory-error</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/27/address-sanitizer/">用 Address Sanitizer 调试内存问题</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/24/A-tour-of-the-dart-language/">Dart 入门 (译)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/21/cell_高度自适应/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/21/lldb/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 Kai<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
